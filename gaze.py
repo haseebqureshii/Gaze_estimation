@@ -8,7 +8,6 @@ def gaze(frame, points):
     The gaze function gets an image and face landmarks from mediapipe framework.
     The function draws the gaze direction into the frame.
     """
-
     '''
     2D image points.
     relative takes mediapipe points that is normalized to [-1, 1] and returns image points
@@ -51,8 +50,9 @@ def gaze(frame, points):
     3D model eye points
     The center of the eye ball
     '''
-    Eye_ball_center_right = np.array([[-29.05], [32.7], [-39.5]])
+    Eye_ball_center_right = np.array([[-29.05], [32.7], [-39.5]]) # the center of the right eyeball as a vector.
     Eye_ball_center_left = np.array([[29.05], [32.7], [-39.5]])  # the center of the left eyeball as a vector.
+    #Eye_ball_center_mean = np.mean( np.array([ Eye_ball_center_right, Eye_ball_center_left ]) )
 
     '''
     camera matrix estimation
@@ -91,9 +91,15 @@ def gaze(frame, points):
                                            rotation_vector,
                                            translation_vector, camera_matrix, dist_coeffs)
         # correct gaze for head rotation
-        gaze = left_pupil + (eye_pupil2D[0][0] - left_pupil) - (head_pose[0][0] - left_pupil)
+        gaze_left = left_pupil + (eye_pupil2D[0][0] - left_pupil) - (head_pose[0][0] - left_pupil)
+        gaze_right = right_pupil + (eye_pupil2D[0][0] - right_pupil) - (head_pose[0][0] - right_pupil)
 
         # Draw gaze line into screen
         p1 = (int(left_pupil[0]), int(left_pupil[1]))
-        p2 = (int(gaze[0]), int(gaze[1]))
+        p2 = (int(gaze_left[0]), int(gaze_left[1]))
+
+        p3 = (int(right_pupil[0]), int(right_pupil[1]))
+        p4 = (int(gaze_right[0]), int(gaze_right[1]))
+
         cv2.line(frame, p1, p2, (0, 0, 255), 2)
+        cv2.line(frame, p3, p4, (0, 0, 255), 2)
